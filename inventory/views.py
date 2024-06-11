@@ -39,3 +39,14 @@ class GetItem(APIView):
 			return Response(item.__dict__)
 		except ValueError as e:
 			return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+
+class DeleteItem(APIView):
+	"""
+	Delete a product from the inventory.
+	"""
+	def delete(self, request, item_id, format = None):
+		try:
+			inventory.remove_item(item_id)
+			return Response({'message': 'Item deleted successfully'})
+		except ValueError as e:
+			return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)

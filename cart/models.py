@@ -1,7 +1,8 @@
 from typing import Dict
 from inventory.models import Item, Inventory
+from discount.models import DiscountManager
 class Cart:
-	def __init__(self, customer_id: str, inventory: Inventory):
+	def __init__(self, customer_id: int, inventory: Inventory):
 		self.customer_id = customer_id
 		self.items: Dict[str, Item] = {}
 		self.inventory = inventory
@@ -25,3 +26,10 @@ class Cart:
 
 	def calculate_total(self) -> float:
 		return sum([item.price * item.quantity for item in self.items.values()])
+
+	def get_items(self):
+		return self.items
+ 
+	def apply_discount(self, discount_id):
+			discount_manager = DiscountManager()  # Ideally, this should be passed to the Cart instance, not created here
+			self.total = discount_manager.apply_discount(self.calculate_total(), discount_id)
