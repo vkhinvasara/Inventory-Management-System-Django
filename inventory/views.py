@@ -11,7 +11,7 @@ class ItemList(APIView):
     List all products in the inventory.
     """
     def get(self, request, format = None):
-        items = [item.__dict__ for item in inventory.list_products()]
+        items = [item.__dict__ for item in inventory.list_items()]
         return Response(items)
 
 class AddItem(APIView):
@@ -26,5 +26,16 @@ class AddItem(APIView):
 			description = request.data.get('description'),
 			quantity = request.data.get('quantity')
 		)
-		inventory.add_product(item)
+		inventory.add_item(item)
 		return Response(item.__dict__, status=status.HTTP_201_CREATED)
+
+class GetItem(APIView):
+	"""
+	Get a product from the inventory.
+	"""
+	def get(self, request, item_id, format = None):
+		try:
+			item = inventory.get_item(item_id)
+			return Response(item.__dict__)
+		except ValueError as e:
+			return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
