@@ -1,7 +1,7 @@
 from typing import Dict, List
 
 class Item:
-    def __init__(self,item_id:int ,name: str, price: float, description: str, quantity: int):
+    def __init__(self,item_id:str ,name: str, price: float, description: str, quantity: int):
         self.item_id = item_id
         self.name = name
         self.price = price
@@ -24,3 +24,8 @@ class Inventory:
 
 	def list_products(self) -> List[Item]:
 		return list(self.items.values())
+
+	def check_stock(self, item_id: str, quantity: int) -> bool:
+		if item_id in self.items:
+			return self.items[item_id].quantity >= quantity
+		return False
