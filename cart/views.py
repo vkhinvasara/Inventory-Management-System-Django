@@ -59,10 +59,25 @@ class CartTotalView(APIView):
         return Response({'total': total})
 
 class CartApplyDiscountView(APIView):
-     def get(self, request, customer_id, discount_id):
+     def post(self, request, customer_id, discount_id):
         cart = carts[customer_id]
         total = cart.calculate_total()
 
         total_after_discount = discount_manager.apply_discount(total, discount_id)
-
+        cart.total = total_after_discount
         return Response({'total_after_discount': total_after_discount})
+    
+
+class CheckoutView(APIView):
+    def post(self, request, customer_id):
+        if customer_id in carts:
+            cart = carts[customer_id]
+            for item_id, item in cart.items.items():
+                inventory.reduce_item_quantity(item_id, item.quantity)
+            total = cart.total if cart.total is not None else cart.calculate_total()
+            cart.empty_cart()
+            if total == 0:
+                return Response({'error': 'Cart is empty'}, status=400)
+            return Response({'status': 'checkout successful', 'total': total})
+        else:
+            return Response({'error': 'Invalid customer_id'}, status=400)

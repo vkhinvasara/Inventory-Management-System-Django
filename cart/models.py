@@ -1,20 +1,21 @@
 from typing import Dict
 from inventory.models import Item, Inventory
-from discount.models import DiscountManager
+from discount.views import discount_manager
 class Cart:
 	def __init__(self, customer_id: int, inventory: Inventory):
 		self.customer_id = customer_id
 		self.items: Dict[str, Item] = {}
 		self.inventory = inventory
+		self.total = None
 
 	def add_item(self, item_id: int, quantity: int = 1) -> None:
 		if self.inventory.check_stock(item_id, quantity):
-			item = self.inventory.items[item_id]
+			inventory_item = self.inventory.items[item_id]
+			item = Item(inventory_item.item_id, inventory_item.name, inventory_item.price, inventory_item.description, quantity)
 			if item.item_id in self.items:
 				self.items[item.item_id].quantity += quantity
 			else:
 				self.items[item_id] = item
-				self.items[item.item_id].quantity = quantity
 		else:
 			raise ValueError(f"No item found with id {item_id} or not enough stock")
 
@@ -31,5 +32,9 @@ class Cart:
 		return self.items
  
 	def apply_discount(self, discount_id):
-			discount_manager = DiscountManager()  # Ideally, this should be passed to the Cart instance, not created here
 			self.total = discount_manager.apply_discount(self.calculate_total(), discount_id)
+   
+	def empty_cart(self):
+		self.items = {}
+		self.total = None
+		

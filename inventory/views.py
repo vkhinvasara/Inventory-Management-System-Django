@@ -44,9 +44,9 @@ class DeleteItem(APIView):
 	"""
 	Delete a product from the inventory.
 	"""
-	def delete(self, request, item_id, format = None):
+	def delete(self, request, item_id, quantity, format = None):
 		try:
-			inventory.remove_item(item_id)
+			inventory.remove_item(item_id, quantity)
 			return Response({'message': 'Item deleted successfully'})
 		except ValueError as e:
 			return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
